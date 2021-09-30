@@ -1,0 +1,51 @@
+import express, { Application, NextFunction, Request, Response } from "express";
+import createHttpError from "http-errors";
+import cors from "cors";
+import "dotenv/config";
+
+import browserHistoryRouter from "./routers/browserHistoryRouter";
+import indexRouter from "./routers/indexRouter";
+import "./db";
+
+const app: Application = express();
+
+app.use(express.json());
+app.use(
+  express.urlencoded({
+    extended: true,
+  }),
+);
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    optionsSuccessStatus: 200,
+  }),
+);
+
+app.use("/", indexRouter);
+app.use("/browser-history", browserHistoryRouter);
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  next(createHttpError(404));
+});
+
+app.use(
+  (
+    err: createHttpError.HttpError | Error,
+    req: Request,
+    res: Response,
+  ): void => {
+    console.log(err);
+
+    res.json({
+      result: "error",
+      error: err,
+    });
+  },
+);
+
+app.listen(process.env.PORT, () => {
+  console.log(`✅ listening on ${process.env.SERVER_URL}`);
+});
+
+export default app;
