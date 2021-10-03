@@ -41,8 +41,25 @@ export const getBrowserHistory = (
   next: NextFunction,
 ): void => {};
 
-export const deleteBrowserHistory = (
+export const deleteBrowserHistory = async (
   req: Request,
   res: Response,
   next: NextFunction,
-): void => {};
+): Promise<void> => {
+  const { browser_history_id: browserHistoryId } = req.params;
+
+  try {
+    const { deletedCount } = await BrowserHistory.deleteOne({
+      nanoId: browserHistoryId,
+    });
+
+    if (deletedCount === 0) {
+      res.status(400).json(createError(2002, ERROR.HISTORY_ID_NOT_EXIST));
+      return;
+    }
+
+    res.json({ result: "ok" });
+  } catch (error) {
+    res.status(500).json(createError(2001, ERROR.HISTORY_DELETE));
+  }
+};

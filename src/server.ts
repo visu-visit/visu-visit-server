@@ -1,5 +1,6 @@
 import express, { Application, NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
+import morgan from "morgan";
 import cors from "cors";
 import "dotenv/config";
 
@@ -10,6 +11,7 @@ import ERROR from "./constants/errorMessage";
 
 const app: Application = express();
 
+app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
