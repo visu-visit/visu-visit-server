@@ -38,3 +38,9 @@ export interface IBrowserHistory {
   totalVisits: IVisit[];
   domainNodes: IDomainNode[];
 }
+
+export interface IBrowserHistoryQuery {
+  start?: string;
+  end?: string;
+  domain?: string;
+}

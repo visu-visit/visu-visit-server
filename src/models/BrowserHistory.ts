@@ -3,7 +3,7 @@ import validator from "validator";
 
 const visitSchema = new mongoose.Schema({
   visitId: { type: Number, required: true },
-  visitTime: { type: String, required: true },
+  visitTime: { type: Date, required: true },
   visitUrl: {
     type: String,
     required: {
@@ -15,7 +15,7 @@ const visitSchema = new mongoose.Schema({
   urlVisitCount: { type: Number, required: true },
   visitTitle: { type: String, default: "" },
   visitDuration: { type: Number, required: true, default: 0 },
-  lastVisitTime: { type: String, required: true },
+  lastVisitTime: { type: Date, required: true },
   transition: {
     type: String,
     enum: [
@@ -34,7 +34,7 @@ const visitSchema = new mongoose.Schema({
   },
   fromVisitId: { type: Number },
   fromVisitUrl: { type: String },
-  fromVisitTime: { type: String },
+  fromVisitTime: { type: Date },
   fromVisitTitle: { type: String },
 });
 

@@ -1,10 +1,15 @@
 import fs from "fs";
 import { Request, Response } from "express";
+import {
+  IVisit,
+  IBrowserHistory,
+  IDomainNode,
+  IBrowserHistoryQuery,
+} from "../types/history.type";
 
 import BrowserHistory from "../models/BrowserHistory";
 import extractDomainNodesFromVisits from "../utils/history/extractDomainNodesFromVisits";
 import createError from "../utils/createError";
-import { IDomainNode, IBrowserHistory } from "../types/history.type";
 import { getVisitData } from "../sqlite3/index";
 import ERROR from "../constants/errorMessage";
 
@@ -35,7 +40,56 @@ export const saveBrowserHistory = async (
   }
 };
 
-export const getBrowserHistory = (req: Request, res: Response): void => {};
+export const getBrowserHistory = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const { browser_history_id: browserHistoryId } = req.params;
+  const { start, end, domain }: IBrowserHistoryQuery = req.query;
+
+  const browserHistory: IBrowserHistory = await BrowserHistory.findOne({
+    nanoId: browserHistoryId,
+  }).lean();
+
+  if (!browserHistory) {
+    res.status(500).json(createError(2007, ERROR.HISTORY_PROCESS));
+    return;
+  }
+
+  const ONE_DAY = 1000 * 60 * 60 * 24;
+  const { domainNodes, totalVisits } = browserHistory;
+  let filteredDomainNodes: IDomainNode[] = domainNodes;
+  let filteredVisits: IVisit[] = totalVisits;
+
+  if (start && end) {
+    filteredVisits = totalVisits.filter(
+      ({ visitTime }) =>
+        new Date(start) <= new Date(visitTime) &&
+        new Date(visitTime) < new Date(new Date(end).getTime() + ONE_DAY),
+    );
+
+    filteredDomainNodes = extractDomainNodesFromVisits(filteredVisits);
+  }
+
+  if (domain) {
+    filteredVisits = filteredVisits.filter(({ visitUrl }) =>
+      new URL(visitUrl).origin.includes(domain),
+    );
+
+    filteredDomainNodes = filteredDomainNodes.filter(
+      ({ domainName }: IDomainNode) => domainName.includes(domain),
+    );
+  }
+
+  res.json({
+    result: "ok",
+    data: {
+      nanoId: browserHistoryId,
+      totalVisits: filteredVisits,
+      domainNodes: filteredDomainNodes,
+    },
+  });
+};
 
 export const modifyBrowserHistory = async (
   req: Request,

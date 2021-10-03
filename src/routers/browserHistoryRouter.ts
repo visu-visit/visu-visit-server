@@ -9,6 +9,7 @@ import {
   uploadHistoryFile,
   validateBrowserHistory,
   validateBrowserHistoryId,
+  validateBrowserHistoryQueries,
 } from "../middlewares";
 
 const browserHistoryRouter = express.Router();
@@ -16,7 +17,7 @@ const browserHistoryRouter = express.Router();
 browserHistoryRouter
   .route("/:browser_history_id")
   .all(validateBrowserHistoryId)
-  .get(getBrowserHistory)
+  .get(validateBrowserHistoryQueries, getBrowserHistory)
   .post(uploadHistoryFile, saveBrowserHistory)
   .put(validateBrowserHistory, modifyBrowserHistory)
   .delete(deleteBrowserHistory);

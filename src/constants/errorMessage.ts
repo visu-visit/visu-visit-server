@@ -10,6 +10,7 @@ const ERROR: IError = {
   INVALID_HISTORY_ID: "유효하지 않은 히스토리 ID 입니다.",
   HISTORY_ID_NOT_EXIST: "해당 ID의 히스토리는 존재하지 않습니다.",
   INVALID_HISTORY_FORMAT: "유효하지 않은 히스토리 형식입니다.",
+  INVALID_HISTORY_QUERY: "유효하지 않은 인자가 전달되었습니다.",
 };
 
 export default ERROR;
