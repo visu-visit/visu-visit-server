@@ -3,7 +3,7 @@ export interface IVisit {
   visitTime: string;
   visitUrl: string;
   urlVisitCount: number;
-  visitTitle: string;
+  visitTitle: string | null;
   visitDuration: string;
   lastVisitTime: string;
   transition:
