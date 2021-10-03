@@ -1,16 +1,16 @@
-import { NextFunction, Request, Response } from "express";
 import fs from "fs";
-import { IDomainNode, IBrowserHistory } from "../types/history.type";
+import { Request, Response } from "express";
+
+import BrowserHistory from "../models/BrowserHistory";
 import extractDomainNodesFromVisits from "../utils/history/extractDomainNodesFromVisits";
+import createError from "../utils/createError";
+import { IDomainNode, IBrowserHistory } from "../types/history.type";
 import { getVisitData } from "../sqlite3/index";
 import ERROR from "../constants/errorMessage";
-import createError from "../utils/createError";
-import BrowserHistory from "../models/BrowserHistory";
 
 export const saveBrowserHistory = async (
   req: Request,
   res: Response,
-  next: NextFunction,
 ): Promise<void> => {
   const { browser_history_id: browserHistoryId } = req.params;
 
@@ -35,16 +35,30 @@ export const saveBrowserHistory = async (
   }
 };
 
-export const getBrowserHistory = (
+export const getBrowserHistory = (req: Request, res: Response): void => {};
+
+export const modifyBrowserHistory = async (
   req: Request,
   res: Response,
-  next: NextFunction,
-): void => {};
+): Promise<void> => {
+  const { browser_history_id: browserHistoryId } = req.params;
+  const browserHistory: IBrowserHistory = req.body;
+
+  try {
+    await BrowserHistory.updateOne(
+      { nanoId: browserHistoryId },
+      { ...browserHistory },
+    );
+
+    res.json({ result: "ok" });
+  } catch (error) {
+    res.status(500).json(createError(2004, ERROR.HISTORY_PROCESS));
+  }
+};
 
 export const deleteBrowserHistory = async (
   req: Request,
   res: Response,
-  next: NextFunction,
 ): Promise<void> => {
   const { browser_history_id: browserHistoryId } = req.params;
 
