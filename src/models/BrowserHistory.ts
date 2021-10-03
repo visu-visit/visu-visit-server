@@ -39,13 +39,13 @@ const visitSchema = new mongoose.Schema({
 });
 
 const domainNodeSchema = new mongoose.Schema({
-  nanoId: { type: String, unique: true },
-  domainName: { type: String, unique: true, minLength: 1, maxLength: 200 },
+  nanoId: { type: String },
+  domainName: { type: String, minLength: 1, maxLength: 200 },
   position: { x: Number, y: Number },
 });
 
 const browserHistorySchema = new mongoose.Schema({
-  nanoId: { type: String, unique: true },
+  nanoId: { type: String },
   totalVisits: [visitSchema],
   domainNodes: [domainNodeSchema],
 });
