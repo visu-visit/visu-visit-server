@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import { IDomainNode, IVisit } from "../../types/history.type";
 
-const extractNodesFromVisits = (visits: IVisit[]): IDomainNode[] => {
+const extractDomainNodesFromVisits = (visits: IVisit[]): IDomainNode[] => {
   const nodeByDomain: {
     [key: string]: IDomainNode;
   } = {};
@@ -21,4 +21,4 @@ const extractNodesFromVisits = (visits: IVisit[]): IDomainNode[] => {
   return Object.values(nodeByDomain);
 };
 
-export default extractNodesFromVisits;
+export default extractDomainNodesFromVisits;
