@@ -6,15 +6,12 @@ import "dotenv/config";
 import browserHistoryRouter from "./routers/browserHistoryRouter";
 import indexRouter from "./routers/indexRouter";
 import "./db";
+import ERROR from "./constants/errorMessage";
 
 const app: Application = express();
 
 app.use(express.json());
-app.use(
-  express.urlencoded({
-    extended: true,
-  }),
-);
+app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
@@ -29,20 +26,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next(createHttpError(404));
 });
 
-app.use(
-  (
-    err: createHttpError.HttpError | Error,
-    req: Request,
-    res: Response,
-  ): void => {
-    console.log(err);
-
-    res.json({
-      result: "error",
-      error: err,
-    });
-  },
-);
+app.use((err: Error, req: Request, res: Response): void => {
+  res.json({
+    result: "error",
+    error: { code: 1000, message: ERROR.INTERNAL_SERVER },
+  });
+});
 
 app.listen(process.env.PORT, () => {
   console.log(`✅ listening on ${process.env.SERVER_URL}`);
