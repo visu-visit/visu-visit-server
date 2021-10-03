@@ -1,4 +1,5 @@
 import express from "express";
+import { uploadHistoryFile } from "../middlewares";
 import {
   getBrowserHistory,
   saveBrowserHistory,
@@ -10,7 +11,7 @@ const browserHistoryRouter = express.Router();
 browserHistoryRouter
   .route("/:browser_history_id")
   .get(getBrowserHistory)
-  .post(saveBrowserHistory)
+  .post(uploadHistoryFile, saveBrowserHistory)
   .delete(deleteBrowserHistory);
 
 export default browserHistoryRouter;

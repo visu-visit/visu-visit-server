@@ -13,16 +13,10 @@
   "rules": {
     "no-unused-vars": "warn",
     "quotes": ["error", "double"],
-    "object-curly-newline": [
-      "error",
-      {
-        "ObjectExpression": "always",
-        "ObjectPattern": { "multiline": true },
-        "ImportDeclaration": { "multiline": true },
-        "ExportDeclaration": { "multiline": true }
-      }
-    ],
+    "object-curly-newline": ["error", { "consistent": true }],
     "import/extensions": "off",
-    "import/no-unresolved": "off"
+    "import/no-unresolved": "off",
+    "implicit-arrow-linebreak": "off",
+    "operator-linebreak": ["error", "after"]
   }
 }
