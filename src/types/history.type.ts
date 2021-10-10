@@ -1,46 +1,52 @@
+export type UrlTransition =
+  | "Link"
+  | "Typed"
+  | "Auto_Bookmark"
+  | "Auto_Subframe"
+  | "Manual_Subframe"
+  | "Generated"
+  | "Auto_Toplevel"
+  | "Form_Submit"
+  | "Reload"
+  | "Keyword"
+  | "Keyword_Generated";
+
 export interface IVisit {
-  visitId: number;
-  visitTime: string;
-  visitUrl: string;
-  urlVisitCount: number;
-  visitTitle: string | null;
-  visitDuration: string;
-  lastVisitTime: string;
-  transition:
-    | "Link"
-    | "Typed"
-    | "Auto_Bookmark"
-    | "Auto_Subframe"
-    | "Manual_Subframe"
-    | "Generated"
-    | "Auto_Toplevel"
-    | "Form_Submit"
-    | "Reload"
-    | "Keyword"
-    | "Keyword_Generated";
-  fromVisitId: number;
-  fromVisitTime: null | string;
-  fromVisitUrl: null | string;
-  fromVisitTitle: null | string;
+  readonly visitId: number;
+  readonly targetUrl: string;
+  readonly targetUrlVisitCount: number;
+  readonly visitDuration: number;
+  readonly visitTime: string;
+  readonly transitionType: UrlTransition;
+  readonly sourceUrl: null | string;
+  readonly sourceUrlVisitCount: number;
 }
 
-export interface IDomainNode {
-  domainName: string;
-  nanoId: string;
-  position: {
-    x: Number;
-    y: Number;
-  };
+export interface INodePosition {
+  x?: number;
+  y?: number;
+  vx?: number;
+  vy?: number;
+  fx?: number;
+  fy?: number;
+}
+
+export interface IDomainNode extends INodePosition {
+  readonly name: string;
+  index?: number;
+  visitCount: number;
+  visitDuration: number;
+  lastVisitTime: string | null;
 }
 
 export interface IBrowserHistory {
-  nanoId: string;
+  readonly nanoId: string;
   totalVisits: IVisit[];
   domainNodes: IDomainNode[];
 }
 
 export interface IBrowserHistoryQuery {
-  start?: string;
-  end?: string;
-  domain?: string;
+  readonly start?: string;
+  readonly end?: string;
+  readonly domain?: string;
 }

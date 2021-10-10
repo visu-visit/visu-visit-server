@@ -38,21 +38,20 @@ export const validateBrowserHistoryId = (
 };
 
 const isDomainNode = (data: any): data is IDomainNode =>
-  data.domainName !== undefined &&
-  data.nanoId !== undefined &&
-  data.position !== undefined &&
-  data.position.x !== undefined &&
-  data.position.y !== undefined;
+  data.name !== undefined &&
+  data.visitCount !== undefined &&
+  data.visitDuration !== undefined &&
+  data.lastVisitTime !== undefined;
 
 const isVisit = (data: any): data is IVisit =>
   data.visitId !== undefined &&
   data.visitTime !== undefined &&
-  data.visitUrl !== undefined &&
-  data.urlVisitCount !== undefined &&
+  data.targetUrl !== undefined &&
+  data.targetUrlVisitCount !== undefined &&
   data.visitDuration !== undefined &&
-  data.lastVisitTime !== undefined &&
-  data.transition !== undefined &&
-  data.fromVisitId !== undefined;
+  data.transitionType !== undefined &&
+  data.sourceUrl !== undefined &&
+  data.sourceUrlVisitCount !== undefined;
 
 const isBrowserHistory = (data: any): data is IBrowserHistory => {
   if (typeof data !== "object") {

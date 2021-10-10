@@ -1,51 +1,39 @@
 import mongoose from "mongoose";
-import validator from "validator";
+
+import { URL_TRANSITION_TYPE } from "../constants/index";
 
 const visitSchema = new mongoose.Schema({
   visitId: { type: Number, required: true },
   visitTime: { type: Date, required: true },
-  visitUrl: {
-    type: String,
-    required: {
-      validate: {
-        validator: (url: any) => validator.isURL(String(url)),
-      },
-    },
-  },
-  urlVisitCount: { type: Number, required: true },
-  visitTitle: { type: String, default: "" },
+  targetUrl: { type: String, minLength: 1, maxLength: 2048, required: true },
+  targetUrlVisitCount: { type: Number, required: true, default: 1 },
   visitDuration: { type: Number, required: true, default: 0 },
-  lastVisitTime: { type: Date, required: true },
-  transition: {
+  transitionType: {
     type: String,
-    enum: [
-      "Link",
-      "Typed",
-      "Auto_Bookmark",
-      "Auto_Subframe",
-      "Manual_Subframe",
-      "Generated",
-      "Auto_Toplevel",
-      "Form_Submit",
-      "Reload",
-      "Keyword",
-      "Keyword_Generated",
-    ],
+    enum: URL_TRANSITION_TYPE,
+    required: true,
+    default: "Link",
   },
-  fromVisitId: { type: Number },
-  fromVisitUrl: { type: String },
-  fromVisitTime: { type: Date },
-  fromVisitTitle: { type: String },
+  sourceUrl: { type: String, minLength: 1, maxLength: 2048 },
+  sourceUrlVisitCount: { type: Number, default: 1 },
 });
 
 const domainNodeSchema = new mongoose.Schema({
-  nanoId: { type: String },
-  domainName: { type: String, minLength: 1, maxLength: 200 },
-  position: { x: Number, y: Number },
+  name: { type: String, minLength: 1, maxLength: 2048, required: true },
+  visitCount: { type: Number, default: 0, required: true },
+  visitDuration: { type: Number, default: 0, required: true },
+  lastVisitTime: { type: Date, required: true },
+  index: Number,
+  x: Number,
+  y: Number,
+  fx: Number,
+  fy: Number,
+  vx: Number,
+  vy: Number,
 });
 
 const browserHistorySchema = new mongoose.Schema({
-  nanoId: { type: String },
+  nanoId: { type: String, required: true },
   totalVisits: [visitSchema],
   domainNodes: [domainNodeSchema],
 });
