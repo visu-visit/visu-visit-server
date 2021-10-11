@@ -18,8 +18,8 @@ export interface IVisit {
   readonly visitDuration: number;
   readonly visitTime: string;
   readonly transitionType: UrlTransition;
-  readonly sourceUrl: null | string;
-  readonly sourceUrlVisitCount: number;
+  readonly sourceUrl: string | null;
+  readonly sourceUrlVisitCount: number | null;
 }
 
 export interface INodePosition {
