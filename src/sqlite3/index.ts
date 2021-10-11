@@ -38,16 +38,19 @@ const QUERY_VISIT_DATA = `
   SecondQuery ON visits.from_visit = SecondQuery.id
   `;
 
+const VISIT_LIMIT = 30000;
+
 const getVisitData = (): Promise<IVisit[]> =>
   new Promise((resolve, reject) => {
-    const database = new sqlite3.Database(
-      "src/tempHistory/History.db",
-      sqlite3.OPEN_READONLY,
-    );
+    const database = new sqlite3.Database("src/tempHistory/History.db", sqlite3.OPEN_READONLY);
 
     database.all(QUERY_VISIT_DATA, [], (err, visits: IVisit[]) => {
       if (err) {
         reject(err);
+      }
+
+      if (visits.length > VISIT_LIMIT) {
+        resolve(visits.slice(-VISIT_LIMIT));
       }
 
       resolve(visits);
