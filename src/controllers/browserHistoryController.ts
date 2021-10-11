@@ -25,7 +25,6 @@ export const saveBrowserHistory = async (req: Request, res: Response): Promise<v
 
     res.json({ result: "ok", data: browserHistory });
   } catch (error) {
-    console.log(error);
     res.status(500).json(createError(2000, ERROR.HISTORY_PROCESS));
   } finally {
     fs.unlinkSync("src/tempHistory/History.db");
@@ -55,17 +54,17 @@ export const getBrowserHistory = async (req: Request, res: Response): Promise<vo
         new Date(start) <= new Date(visitTime) &&
         new Date(visitTime) < new Date(new Date(end).getTime() + ONE_DAY),
     );
-    filteredDomainNodes = extractDomainNodesFromVisits(filteredVisits);
   }
 
   if (domain) {
-    filteredVisits = filteredVisits.filter(({ sourceUrl }) =>
-      new URL(sourceUrl).origin.includes(domain),
-    );
-    filteredDomainNodes = filteredDomainNodes.filter(({ name }: IDomainNode) =>
-      name.includes(domain),
+    filteredVisits = filteredVisits.filter(
+      ({ targetUrl, sourceUrl }) =>
+        new URL(targetUrl).origin.includes(domain) ||
+        (sourceUrl && new URL(sourceUrl).origin.includes(domain)),
     );
   }
+
+  filteredDomainNodes = extractDomainNodesFromVisits(filteredVisits);
 
   res.json({
     result: "ok",
