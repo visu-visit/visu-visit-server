@@ -37,6 +37,8 @@ export interface IDomainNode extends INodePosition {
   visitCount: number;
   visitDuration: number;
   lastVisitTime: string | null;
+  memo?: string;
+  color?: string;
 }
 
 export interface IBrowserHistory {
