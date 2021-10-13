@@ -23,6 +23,8 @@ const domainNodeSchema = new mongoose.Schema({
   visitCount: { type: Number, default: 0, required: true },
   visitDuration: { type: Number, default: 0, required: true },
   lastVisitTime: { type: Date },
+  memo: { type: String, minLength: 1, maxLength: 1024 },
+  color: { type: String, minLength: 1, maxLength: 1024 },
   index: Number,
   x: Number,
   y: Number,

@@ -1,6 +1,9 @@
 import { IDomainNode, IVisit } from "../../types/history.type";
 
-const extractDomainNodesFromVisits = (visits: IVisit[]): IDomainNode[] => {
+const updateDomainNodesFromVisits = (
+  visits: IVisit[],
+  domainNodes: IDomainNode[],
+): IDomainNode[] => {
   const nodeByDomain: {
     [key: string]: IDomainNode;
   } = {};
@@ -17,6 +20,7 @@ const extractDomainNodesFromVisits = (visits: IVisit[]): IDomainNode[] => {
     } = visit;
     const targetDomainOrigin = new URL(targetUrl).origin;
     const targetDomainName = targetDomainOrigin === "null" ? targetUrl : targetDomainOrigin;
+    const targetNode = domainNodes[domainNodes.findIndex(({ name }) => name === targetDomainName)];
 
     if (nodeByDomain[targetDomainName]) {
       nodeByDomain[targetDomainName].visitDuration += visitDuration;
@@ -27,10 +31,10 @@ const extractDomainNodesFromVisits = (visits: IVisit[]): IDomainNode[] => {
       }
     } else {
       nodeByDomain[targetDomainName] = {
+        ...targetNode,
         name: targetDomainName,
         visitCount: targetUrlVisitCount,
         lastVisitTime,
-        visitDuration,
       };
 
       urlMemo[targetUrl] = true;
@@ -42,9 +46,11 @@ const extractDomainNodesFromVisits = (visits: IVisit[]): IDomainNode[] => {
 
     const sourceDomainOrigin = new URL(sourceUrl).origin;
     const sourceDomainName = sourceDomainOrigin === "null" ? sourceUrl : sourceDomainOrigin;
+    const sourceNode = domainNodes[domainNodes.findIndex(({ name }) => name === sourceDomainName)];
 
     if (!nodeByDomain[sourceDomainName]) {
       nodeByDomain[sourceDomainName] = {
+        ...sourceNode,
         name: sourceDomainName,
         visitCount: sourceUrlVisitCount,
         visitDuration: 0,
@@ -56,4 +62,4 @@ const extractDomainNodesFromVisits = (visits: IVisit[]): IDomainNode[] => {
   return Object.values(nodeByDomain);
 };
 
-export default extractDomainNodesFromVisits;
+export default updateDomainNodesFromVisits;

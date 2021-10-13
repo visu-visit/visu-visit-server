@@ -1,11 +1,12 @@
 import fs from "fs";
 import { Request, Response } from "express";
-import { IVisit, IBrowserHistory, IDomainNode, IBrowserHistoryQuery } from "../types/history.type";
+import { getVisitData } from "../sqlite3/index";
 
+import { IVisit, IBrowserHistory, IBrowserHistoryQuery } from "../types/history.type";
 import BrowserHistory from "../models/BrowserHistory";
+import updateDomainNodesFromVisits from "../utils/history/updateDomainNodesFromVisits";
 import extractDomainNodesFromVisits from "../utils/history/extractDomainNodesFromVisits";
 import createError from "../utils/createError";
-import getVisitData from "../sqlite3/index";
 import ERROR from "../constants/errorMessage";
 
 export const saveBrowserHistory = async (req: Request, res: Response): Promise<void> => {
@@ -13,6 +14,7 @@ export const saveBrowserHistory = async (req: Request, res: Response): Promise<v
 
   try {
     const totalVisits = await getVisitData();
+
     const domainNodes = extractDomainNodesFromVisits(totalVisits);
 
     const browserHistory: IBrowserHistory = {
@@ -45,7 +47,6 @@ export const getBrowserHistory = async (req: Request, res: Response): Promise<vo
 
   const ONE_DAY = 1000 * 60 * 60 * 24;
   const { domainNodes, totalVisits } = browserHistory;
-  let filteredDomainNodes: IDomainNode[] = domainNodes;
   let filteredVisits: IVisit[] = totalVisits;
 
   if (start && end) {
@@ -64,14 +65,14 @@ export const getBrowserHistory = async (req: Request, res: Response): Promise<vo
     );
   }
 
-  filteredDomainNodes = extractDomainNodesFromVisits(filteredVisits);
+  const updatedDomainNodes = updateDomainNodesFromVisits(filteredVisits, domainNodes);
 
   res.json({
     result: "ok",
     data: {
       nanoId: browserHistoryId,
       totalVisits: filteredVisits,
-      domainNodes: filteredDomainNodes,
+      domainNodes: updatedDomainNodes,
     },
   });
 };
