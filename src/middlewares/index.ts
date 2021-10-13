@@ -2,12 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import validator from "validator";
 import multer from "multer";
 
-import {
-  IDomainNode,
-  IBrowserHistory,
-  IVisit,
-  IBrowserHistoryQuery,
-} from "../types/history.type";
+import { IDomainNode, IBrowserHistory, IVisit, IBrowserHistoryQuery } from "../types/history.type";
 import ERROR from "../constants/errorMessage";
 import createError from "../utils/createError";
 
@@ -22,11 +17,7 @@ const upload = multer({
 
 export const uploadHistoryFile = upload.single("historyFile");
 
-export const validateBrowserHistoryId = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): void => {
+export const validateBrowserHistoryId = (req: Request, res: Response, next: NextFunction): void => {
   const { browser_history_id: browserHistoryId } = req.params;
 
   if (typeof browserHistoryId !== "string") {
@@ -85,11 +76,7 @@ const isBrowserHistory = (data: any): data is IBrowserHistory => {
   return true;
 };
 
-export const validateBrowserHistory = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): void => {
+export const validateBrowserHistory = (req: Request, res: Response, next: NextFunction): void => {
   if (isBrowserHistory(req.body)) {
     next();
     return;

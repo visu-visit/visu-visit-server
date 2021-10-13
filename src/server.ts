@@ -10,9 +10,10 @@ import "./db";
 import ERROR from "./constants/errorMessage";
 
 const app: Application = express();
+const BODY_LIMIT = "50MB";
 
 app.use(morgan("dev"));
-app.use(express.json());
+app.use(express.json({ limit: BODY_LIMIT }));
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({

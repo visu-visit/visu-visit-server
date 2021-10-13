@@ -1,7 +1,5 @@
-import sqlite3 from "sqlite3";
+import Database from "better-sqlite3";
 import { IVisit } from "../types/history.type";
-
-sqlite3.verbose();
 
 const QUERY_VISIT_DATA = `
   SELECT
@@ -38,22 +36,19 @@ const QUERY_VISIT_DATA = `
   SecondQuery ON visits.from_visit = SecondQuery.id
   `;
 
-const getVisitData = (): Promise<IVisit[]> =>
-  new Promise((resolve, reject) => {
-    const database = new sqlite3.Database(
-      "src/tempHistory/History.db",
-      sqlite3.OPEN_READONLY,
-    );
+const VISIT_LIMIT = 30000;
 
-    database.all(QUERY_VISIT_DATA, [], (err, visits: IVisit[]) => {
-      if (err) {
-        reject(err);
-      }
+export const getVisitData = (): Promise<IVisit[]> =>
+  new Promise((resolve) => {
+    const db = new Database("src/tempHistory/History.db");
 
-      resolve(visits);
-    });
+    const visits = db.prepare(QUERY_VISIT_DATA).all();
 
-    database.close();
+    if (visits.length > VISIT_LIMIT) {
+      resolve(visits.slice(-VISIT_LIMIT));
+    }
+
+    resolve(visits);
   });
 
 export default getVisitData;
