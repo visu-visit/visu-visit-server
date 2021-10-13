@@ -46,14 +46,17 @@ export const getBrowserHistory = async (req: Request, res: Response): Promise<vo
   }
 
   const ONE_DAY = 1000 * 60 * 60 * 24;
+  const UTC_SEOUL_HOUR_DIFFERENCE = 1000 * 60 * 60 * 9;
+
   const { domainNodes, totalVisits } = browserHistory;
   let filteredVisits: IVisit[] = totalVisits;
 
   if (start && end) {
     filteredVisits = totalVisits.filter(
       ({ visitTime }) =>
-        new Date(start) <= new Date(visitTime) &&
-        new Date(visitTime) < new Date(new Date(end).getTime() + ONE_DAY),
+        new Date(start).getTime() <= new Date(visitTime).getTime() + UTC_SEOUL_HOUR_DIFFERENCE &&
+        new Date(visitTime).getTime() + UTC_SEOUL_HOUR_DIFFERENCE <
+          new Date(end).getTime() + ONE_DAY,
     );
   }
 
