@@ -34,6 +34,7 @@ const updateDomainNodesFromVisits = (
         ...targetNode,
         name: targetDomainName,
         visitCount: targetUrlVisitCount,
+        visitDuration,
         lastVisitTime,
       };
 
