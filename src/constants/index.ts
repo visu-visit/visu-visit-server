@@ -12,4 +12,5 @@ export const URL_TRANSITION_TYPE = [
   "Reload",
   "Keyword",
   "Keyword_Generated",
+  null,
 ];

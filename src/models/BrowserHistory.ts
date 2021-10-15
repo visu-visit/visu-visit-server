@@ -5,16 +5,15 @@ import { URL_TRANSITION_TYPE } from "../constants/index";
 const visitSchema = new mongoose.Schema({
   visitId: { type: Number, required: true },
   visitTime: { type: Date, required: true },
-  targetUrl: { type: String, minLength: 1, maxLength: 4096, required: true },
+  targetUrl: { type: String, minLength: 1, required: true },
   targetUrlVisitCount: { type: Number, required: true, default: 1 },
   visitDuration: { type: Number, required: true, default: 0 },
   transitionType: {
     type: String,
     enum: URL_TRANSITION_TYPE,
-    required: true,
     default: "Link",
   },
-  sourceUrl: { type: String, minLength: 1, maxLength: 4096 },
+  sourceUrl: { type: String, minLength: 1 },
   sourceUrlVisitCount: { type: Number, default: 1 },
 });
 
