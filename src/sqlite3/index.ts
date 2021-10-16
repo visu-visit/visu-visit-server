@@ -1,13 +1,16 @@
 import Database from "better-sqlite3";
 import { IVisit } from "../types/history.type";
 
+const VISIT_LIMIT = 30000;
+const TIME_DIFFERENCE_WITH_UNIX_EPOCH_AND_CHROME_TIME_BASE = 11644473600;
+const CHROME_MILLISECOND = 1000000;
 const QUERY_VISIT_DATA = `
   SELECT
     visits.id AS visitId,
     urls.url AS targetUrl,
     urls.visit_count AS targetUrlVisitCount,
-    visits.visit_duration / 1000 / 1000 AS visitDuration,
-    datetime((visits.visit_time / 1000000) - 11644473600, 'unixepoch', 'localtime') AS visitTime,
+    visits.visit_duration / ${CHROME_MILLISECOND} AS visitDuration,
+    datetime((visits.visit_time / ${CHROME_MILLISECOND}) - ${TIME_DIFFERENCE_WITH_UNIX_EPOCH_AND_CHROME_TIME_BASE}, 'unixepoch', 'localtime') AS visitTime,
     CASE visits.transition & 0xFF
       WHEN 0 THEN 'Link'
       WHEN 1 THEN 'Typed'
@@ -34,19 +37,15 @@ const QUERY_VISIT_DATA = `
     LEFT JOIN urls ON visits.url = urls.id
   )
   SecondQuery ON visits.from_visit = SecondQuery.id
-  `;
-
-const VISIT_LIMIT = 30000;
+  ORDER BY visits.id DESC
+  LIMIT 1, ${VISIT_LIMIT}
+`;
 
 export const getVisitData = (): Promise<IVisit[]> =>
   new Promise((resolve) => {
     const db = new Database("src/tempHistory/History.db");
 
     const visits = db.prepare(QUERY_VISIT_DATA).all();
-
-    if (visits.length > VISIT_LIMIT) {
-      resolve(visits.slice(-VISIT_LIMIT));
-    }
 
     resolve(visits);
   });
