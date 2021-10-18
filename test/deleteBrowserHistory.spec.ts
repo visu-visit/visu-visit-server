@@ -59,12 +59,14 @@ describe("deleteBrowserHistory test", function callback() {
           return;
         }
 
+        expect(res.body.result).to.equal("ok");
+
         (async () => {
           try {
             const result = await BrowserHistory.findOne({ nanoId: id }).lean().exec();
 
             expect(result).to.equal(null);
-            expect(res.body.result).to.equal("ok");
+
             done();
           } catch (error) {
             done(error);
@@ -77,8 +79,8 @@ describe("deleteBrowserHistory test", function callback() {
     const randomId = "non-exist-id";
 
     request(server)
-      .get(`/browser-history/${randomId}`)
-      .expect(500)
+      .delete(`/browser-history/${randomId}`)
+      .expect(400)
       .expect("Content-Type", "application/json; charset=utf-8")
       .end((err, res) => {
         if (err) {

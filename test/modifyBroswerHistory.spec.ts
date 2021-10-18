@@ -50,7 +50,7 @@ describe("modifyBrowserHistory test", function callback() {
     })();
   });
 
-  it("SAVE browserHistory by i", (done) => {
+  it("SAVE browserHistory by ID", (done) => {
     request(server)
       .put(`/browser-history/${id}`)
       .send(modifiedMockBrowserHistory)
