@@ -9,7 +9,7 @@ import mockBrowserHistory from "./mockData/mockBrowserHistory.json";
 import server from "../src/server";
 import mockHistoryQueryResult from "./mockData/mockHistoryQueryResult";
 
-describe.only("saveBrowserHistory test", function callback() {
+describe("saveBrowserHistory test", function callback() {
   this.timeout(10000);
 
   const db = mongoose.connection;
@@ -63,29 +63,27 @@ describe.only("saveBrowserHistory test", function callback() {
         }
 
         expect(res.body.result).to.equal("ok");
-        expect(res.body.data).to.deep.equal(mockHistoryQueryResult);
+        expect(res.body.data.nanoId).to.deep.equal(mockHistoryQueryResult.nanoId);
 
         (async () => {
           try {
-            const { totalVisits, domainNodes } = (await BrowserHistory.findOne({
+            const { totalVisits } = (await BrowserHistory.findOne({
               nanoId: id,
             })
               .lean()
               .exec()) as IBrowserHistory;
 
-            expect(
-              mockHistoryQueryResult.totalVisits.every(
-                (visit, index) => visit.targetUrl === totalVisits[index].targetUrl,
-              ),
-            ).to.equal(true);
-            expect(
-              mockHistoryQueryResult.domainNodes.every(
-                (domain, index) => domain.name === domainNodes[index].name,
-              ),
-            ).to.equal(true);
+            totalVisits.sort((a, b) => a.visitId - b.visitId);
 
-            expect(mockHistoryQueryResult.totalVisits.length).to.equal(totalVisits.length);
-            expect(mockHistoryQueryResult.domainNodes.length).to.equal(domainNodes.length);
+            const { totalVisits: mockTotalVisits } = mockHistoryQueryResult;
+
+            mockTotalVisits.sort((a, b) => a.visitId - b.visitId);
+
+            expect(
+              totalVisits.every(
+                (visit, index) => visit.targetUrl === mockTotalVisits[index].targetUrl,
+              ),
+            ).to.equal(true);
 
             done();
           } catch (error) {
