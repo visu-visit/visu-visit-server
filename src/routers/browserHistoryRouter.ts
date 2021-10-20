@@ -1,8 +1,8 @@
 import express from "express";
 import {
-  modifyBrowserHistory,
+  convertHistoryFile,
+  saveOrUpdateBrowserHistory,
   getBrowserHistory,
-  saveBrowserHistory,
   deleteBrowserHistory,
 } from "../controllers/browserHistoryController";
 import {
@@ -18,8 +18,8 @@ browserHistoryRouter
   .route("/:browser_history_id")
   .all(validateBrowserHistoryId)
   .get(validateBrowserHistoryQueries, getBrowserHistory)
-  .post(uploadHistoryFile, saveBrowserHistory)
-  .put(validateBrowserHistory, modifyBrowserHistory)
+  .post(uploadHistoryFile, convertHistoryFile)
+  .put(validateBrowserHistory, saveOrUpdateBrowserHistory)
   .delete(deleteBrowserHistory);
 
 export default browserHistoryRouter;

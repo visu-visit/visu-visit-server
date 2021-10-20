@@ -9,7 +9,7 @@ import extractDomainNodesFromVisits from "../utils/history/extractDomainNodesFro
 import createError from "../utils/createError";
 import ERROR from "../constants/errorMessage";
 
-export const saveBrowserHistory = async (req: Request, res: Response): Promise<void> => {
+export const convertHistoryFile = async (req: Request, res: Response): Promise<void> => {
   const { browser_history_id: browserHistoryId } = req.params;
 
   try {
@@ -22,8 +22,6 @@ export const saveBrowserHistory = async (req: Request, res: Response): Promise<v
       totalVisits,
       domainNodes,
     };
-
-    await BrowserHistory.create(browserHistory);
 
     res.json({ result: "ok", data: browserHistory });
   } catch (error) {
@@ -84,7 +82,7 @@ export const getBrowserHistory = async (req: Request, res: Response): Promise<vo
   }
 };
 
-export const modifyBrowserHistory = async (req: Request, res: Response): Promise<void> => {
+export const saveOrUpdateBrowserHistory = async (req: Request, res: Response): Promise<void> => {
   const { browser_history_id: browserHistoryId } = req.params;
   const browserHistory: IBrowserHistory = req.body;
 
@@ -94,14 +92,12 @@ export const modifyBrowserHistory = async (req: Request, res: Response): Promise
       return;
     }
 
-    const result = await BrowserHistory.findOneAndUpdate(
-      { nanoId: browserHistoryId },
-      { ...browserHistory },
-    );
+    const targetBrowserHistory = await BrowserHistory.findOne({ nanoId: browserHistoryId });
 
-    if (!result) {
-      res.status(500).json(createError(2007, ERROR.HISTORY_ID_NOT_EXIST));
-      return;
+    if (targetBrowserHistory) {
+      await BrowserHistory.updateOne({ nanoId: browserHistoryId }, { ...browserHistory });
+    } else {
+      await BrowserHistory.create(browserHistory);
     }
 
     res.json({ result: "ok" });
