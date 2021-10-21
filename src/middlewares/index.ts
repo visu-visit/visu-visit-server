@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import validator from "validator";
 import multer from "multer";
 
-import { IDomainNode, IBrowserHistory, IVisit, IBrowserHistoryQuery } from "../types/history.type";
+import { IDomainNode, IBrowserHistory, IVisit } from "../types/history.type";
 import ERROR from "../constants/errorMessage";
 import createError from "../utils/createError";
 
@@ -83,36 +82,4 @@ export const validateBrowserHistory = (req: Request, res: Response, next: NextFu
   }
 
   res.status(400).json(createError(2003, ERROR.INVALID_HISTORY_FORMAT));
-};
-
-export const validateBrowserHistoryQueries = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): void => {
-  const { start, end, domain }: IBrowserHistoryQuery = req.query;
-
-  if (domain && typeof domain !== "string") {
-    res.status(400).json(createError(2006, ERROR.INVALID_HISTORY_QUERY));
-    return;
-  }
-
-  if (!start && !end) {
-    next();
-    return;
-  }
-
-  if (
-    !start ||
-    !end ||
-    typeof start !== "string" ||
-    typeof end !== "string" ||
-    !validator.isDate(start) ||
-    !validator.isDate(end)
-  ) {
-    res.status(400).json(createError(2005, ERROR.INVALID_HISTORY_QUERY));
-    return;
-  }
-
-  next();
 };

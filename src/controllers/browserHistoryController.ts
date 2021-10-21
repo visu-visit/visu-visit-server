@@ -2,14 +2,15 @@ import fs from "fs";
 import { Request, Response } from "express";
 import { getVisitData } from "../sqlite3/index";
 
-import { IVisit, IBrowserHistory, IBrowserHistoryQuery } from "../types/history.type";
+import { IBrowserHistory } from "../types/history.type";
 import BrowserHistory from "../models/BrowserHistory";
-import updateDomainNodesFromVisits from "../utils/history/updateDomainNodesFromVisits";
+
 import extractDomainNodesFromVisits from "../utils/history/extractDomainNodesFromVisits";
 import createError from "../utils/createError";
+
 import ERROR from "../constants/errorMessage";
 
-export const saveBrowserHistory = async (req: Request, res: Response): Promise<void> => {
+export const convertHistoryFile = async (req: Request, res: Response): Promise<void> => {
   const { browser_history_id: browserHistoryId } = req.params;
 
   try {
@@ -23,8 +24,6 @@ export const saveBrowserHistory = async (req: Request, res: Response): Promise<v
       domainNodes,
     };
 
-    await BrowserHistory.create(browserHistory);
-
     res.json({ result: "ok", data: browserHistory });
   } catch (error) {
     res.status(500).json(createError(2000, ERROR.HISTORY_PROCESS));
@@ -35,9 +34,6 @@ export const saveBrowserHistory = async (req: Request, res: Response): Promise<v
 
 export const getBrowserHistory = async (req: Request, res: Response): Promise<void> => {
   const { browser_history_id: browserHistoryId } = req.params;
-  const { start, end, domain }: IBrowserHistoryQuery = req.query;
-  const ONE_DAY = 1000 * 60 * 60 * 24;
-  const UTC_SEOUL_HOUR_DIFFERENCE = 1000 * 60 * 60 * 9;
 
   try {
     const browserHistory: IBrowserHistory = await BrowserHistory.findOne({
@@ -45,46 +41,20 @@ export const getBrowserHistory = async (req: Request, res: Response): Promise<vo
     }).lean();
 
     if (!browserHistory) {
-      res.status(500).json(createError(2007, ERROR.HISTORY_PROCESS));
+      res.status(400).json(createError(2007, ERROR.INVALID_HISTORY_ID));
       return;
     }
 
-    const { domainNodes, totalVisits } = browserHistory;
-    let filteredVisits: IVisit[] = totalVisits;
-
-    if (start && end) {
-      filteredVisits = totalVisits.filter(
-        ({ visitTime }) =>
-          new Date(start).getTime() <= new Date(visitTime).getTime() + UTC_SEOUL_HOUR_DIFFERENCE &&
-          new Date(visitTime).getTime() + UTC_SEOUL_HOUR_DIFFERENCE <
-            new Date(end).getTime() + ONE_DAY,
-      );
-    }
-
-    if (domain) {
-      filteredVisits = filteredVisits.filter(
-        ({ targetUrl, sourceUrl }) =>
-          new URL(targetUrl).origin.includes(domain) ||
-          (sourceUrl && new URL(sourceUrl).origin.includes(domain)),
-      );
-    }
-
-    const updatedDomainNodes = updateDomainNodesFromVisits(filteredVisits, domainNodes);
-
     res.json({
       result: "ok",
-      data: {
-        nanoId: browserHistoryId,
-        totalVisits: filteredVisits,
-        domainNodes: updatedDomainNodes,
-      },
+      data: browserHistory,
     });
   } catch (error) {
     res.status(500).json(createError(2000, ERROR.INTERNAL_SERVER));
   }
 };
 
-export const modifyBrowserHistory = async (req: Request, res: Response): Promise<void> => {
+export const saveOrUpdateBrowserHistory = async (req: Request, res: Response): Promise<void> => {
   const { browser_history_id: browserHistoryId } = req.params;
   const browserHistory: IBrowserHistory = req.body;
 
@@ -94,14 +64,12 @@ export const modifyBrowserHistory = async (req: Request, res: Response): Promise
       return;
     }
 
-    const result = await BrowserHistory.findOneAndUpdate(
-      { nanoId: browserHistoryId },
-      { ...browserHistory },
-    );
+    const targetBrowserHistory = await BrowserHistory.findOne({ nanoId: browserHistoryId });
 
-    if (!result) {
-      res.status(500).json(createError(2007, ERROR.HISTORY_ID_NOT_EXIST));
-      return;
+    if (targetBrowserHistory) {
+      await BrowserHistory.updateOne({ nanoId: browserHistoryId }, { ...browserHistory });
+    } else {
+      await BrowserHistory.create(browserHistory);
     }
 
     res.json({ result: "ok" });
