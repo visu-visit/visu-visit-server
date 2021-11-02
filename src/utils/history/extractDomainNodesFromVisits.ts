@@ -1,9 +1,7 @@
 import { IDomainNode, IVisit } from "../../types/history.type";
 
 const extractDomainNodesFromVisits = (visits: IVisit[]): IDomainNode[] => {
-  const nodeByDomain: {
-    [key: string]: IDomainNode;
-  } = {};
+  const nodeByDomain: { [key: string]: IDomainNode } = {};
   const urlMemo: { [domain: string]: boolean } = {};
 
   visits.forEach((visit) => {
